@@ -1,7 +1,10 @@
 class UsersController < ApplicationController
+
   def create
     @user = User.create! create_params
-    json_response @user, status: :created
+
+    json_response @user.to_json(include: { inventories: { only: %i[product quantity] } }),
+                  status: :created
   end
 
   def update
@@ -13,7 +16,12 @@ class UsersController < ApplicationController
   private
 
   def create_params
-    params.require(:user).permit :name, :username, :birth_date, :email, :country
+    params.require(:user).permit :name,
+                                 :username,
+                                 :birth_date,
+                                 :email,
+                                 :country,
+                                 inventories_attributes: %i[product quantity]
   end
 
   def update_params

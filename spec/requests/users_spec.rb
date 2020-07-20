@@ -14,13 +14,20 @@ RSpec.describe "API UsersController", type: :request do
         expect(json[:username]).to eq('marianefps')
       end
 
-      it 'returns status code 201' do
-        expect(response).to have_http_status(201)
+      context 'with inventory' do
+        let(:valid_attributes) {
+          { user: attributes_for(:user, username: 'marianefps',
+                                 inventories_attributes: [{product: 'notebook', quantity: 5 }]) }
+        }
+
+        it 'create a user' do
+          expect(json[:inventories].first[:product]).to eq('notebook')
+          expect(json[:inventories].first[:quantity]).to eq(5)
+        end
       end
 
-      it do
-        should(permit(:name, :username, :birth_date, :email, :country)
-          .for(:create, params: valid_attributes).on(:user))
+      it 'returns status code 201' do
+        expect(response).to have_http_status(201)
       end
     end
 

@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_19_203122) do
+ActiveRecord::Schema.define(version: 2020_07_20_005156) do
+
+  create_table "inventories", force: :cascade do |t|
+    t.string "product"
+    t.integer "quantity"
+    t.integer "user_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id", "product"], name: "index_inventories_on_user_id_and_product", unique: true
+    t.index ["user_id"], name: "index_inventories_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "name"
@@ -22,4 +32,5 @@ ActiveRecord::Schema.define(version: 2020_07_19_203122) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "inventories", "users"
 end

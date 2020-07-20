@@ -1,24 +1,30 @@
-# README
+# User Exchange
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## API
 
-Things you may want to cover:
+### Users
 
-* Ruby version
+#### Create User
 
-* System dependencies
+`POST /api/users`
+`Content-Type: application/json`
 
-* Configuration
+Example:
 
-* Database creation
+```json
+{
+  "user": {
+    "name": "Jane Doe",
+    "username": "Janed",
+    "email": "janed@email.com",
+    "birth_date": "22/01/2000",
+    "country": "br",
+    "inventories_attributes": [{
+     	"product": "notebook" ,
+      "quantity": 20
+    }]
+  }
+}
+```
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+products available: `notebook`, `desktop_gamer`, `laser_printer`, `smartphone` and `mouse`

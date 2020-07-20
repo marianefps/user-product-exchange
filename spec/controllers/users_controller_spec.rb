@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe UsersController, type: :controller do
   it 'valid create params' do
-    valid_attributes = { user: attributes_for(:user) }
+    valid_attributes = { user: attributes_for(:user, inventories_attributes: [attributes_for(:inventory, user: nil)] ) }
 
-    should permit(:name, :username, :birth_date, :email, :country)
+    should permit(:name, :username, :birth_date, :email, :country, inventories_attributes: [:product, :quantity])
       .for(:create, params: valid_attributes).on(:user)
   end
 
