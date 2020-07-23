@@ -5,7 +5,7 @@ class Inventory < ApplicationRecord
     laser_printer: 126,
     smartphone: 50,
     mouse: 20
-  }.freeze
+  }.with_indifferent_access.freeze
 
   belongs_to :user
 

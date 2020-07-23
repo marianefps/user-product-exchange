@@ -5,21 +5,6 @@ RSpec.describe ProductExchangeService do
   let(:receiver) { create :user }
 
   describe '#valid?' do
-
-    let(:params_exchange) do
-      {
-        products_requester: [
-          { product: 'desktop_gamer', quantity: 1 }
-        ],
-        receiver: receiver.id,
-        products_receiver: [
-          { product: 'notebook', quantity: 1 },
-          { product: 'smartphone', quantity: 1 }
-
-        ]
-      }
-    end
-
     context 'product quantity' do
 
       it "false when requester doesn't have any products to exchange" do
@@ -103,6 +88,66 @@ RSpec.describe ProductExchangeService do
 
         expect(exchange.errors).to include("Receiver doesn't have enough quantity of products")
       end
+    end
+
+    it "false when the values amount are different" do
+      create :inventory, product: 'notebook', user: requester, quantity: 2
+
+      create :inventory, product: 'smartphone', user: receiver, quantity: 1
+      create :inventory, product: 'mouse', user: receiver, quantity: 2
+
+      params_exchange = {
+        products_requester: [
+          { product: 'notebook', quantity: 2 }
+        ],
+        receiver: receiver.id,
+        products_receiver: [
+          { product: 'smartphone', quantity: 1},
+          { product: 'mouse', quantity: 2 }
+
+        ]
+      }
+
+      exchange = ProductExchangeService.new requester, params_exchange
+
+      expect(exchange.valid?).to eq(false)
+
+      expect(exchange.errors).to include("Values amount exchange are different")
+    end
+
+    it "false when the kind of requester product is not in the list" do
+      params_exchange = {
+        products_requester: [
+          { product: 'smartphone', quantity: 1},
+          { product: 'monitor', quantity: 2 }
+        ],
+        receiver: receiver.id,
+        products_receiver: [{ product: 'smartphone', quantity: 1}]
+      }
+
+      exchange = ProductExchangeService.new requester, params_exchange
+
+      expect(exchange.valid?).to eq(false)
+
+      expect(exchange.errors).to include("This requester kind of product does not exist")
+    end
+    it "false when the kind of receiver product is not in the list" do
+      params_exchange = {
+        products_requester: [
+          { product: 'smartphone', quantity: 1}
+        ],
+        receiver: receiver.id,
+        products_receiver: [
+          {product: 'smartphone', quantity: 1},
+          { product: 'monitor', quantity: 2 }
+        ]
+      }
+
+      exchange = ProductExchangeService.new requester, params_exchange
+
+      expect(exchange.valid?).to eq(false)
+
+      expect(exchange.errors).to include("This receiver kind of product does not exist")
     end
   end
 end
