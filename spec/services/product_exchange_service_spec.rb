@@ -175,6 +175,7 @@ RSpec.describe ProductExchangeService do
   end
 
   describe '#valid?' do
+
     context 'product quantity' do
       it "false when requester doesn't have any products to exchange" do
         params_exchange = {
@@ -329,6 +330,33 @@ RSpec.describe ProductExchangeService do
       expect(exchange.valid?).to eq(false)
 
       expect(exchange.errors).to include('This receiver kind of product does not exist')
+    end
+
+    it 'false when requester is on vacation' do
+      params_exchange = {
+        products_requester: [],
+        receiver: receiver.id,
+        products_receiver: []
+      }
+
+      requester.update on_vacation: true
+      exchange = ProductExchangeService.new requester, params_exchange
+      expect(exchange.valid?).to eq(false)
+
+      expect(exchange.errors).to include('Inventory is unavailable for requester')
+    end
+    it 'false when receiver is on vacation' do
+      params_exchange = {
+        products_requester: [],
+        receiver: receiver.id,
+        products_receiver: []
+      }
+
+      receiver.update on_vacation: true
+      exchange = ProductExchangeService.new requester, params_exchange
+      expect(exchange.valid?).to eq(false)
+
+      expect(exchange.errors).to include('Inventory is unavailable for receiver')
     end
   end
 end

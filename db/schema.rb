@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_24_232130) do
+ActiveRecord::Schema.define(version: 2020_07_26_212000) do
 
   create_table "inventories", force: :cascade do |t|
     t.string "product"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 2020_07_24_232130) do
     t.string "country"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "on_vacation", default: false
   end
 
   add_foreign_key "inventories", "users"

@@ -1,8 +1,32 @@
 require 'rails_helper'
 
 RSpec.describe "API UsersController", type: :request do
-  let(:requester) { create :user }
-  let(:receiver) { create :user }
+
+
+  describe "GET /api/users/:id" do
+    let(:user) do
+      create :user, inventories_attributes: [{product: 'notebook', quantity: 5 }]
+    end
+
+    before { get user_path(user) }
+
+    it 'returns status code ok' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'return user attributes' do
+
+      expect(json[:id]).to eq(user.id)
+      expect(json[:name]).to eq(user.name)
+      expect(json[:email]).to eq(user.email)
+      expect(json[:birth_date].to_date).to eq(user.birth_date)
+      expect(json[:country]).to eq(user.country)
+      expect(json[:username]).to eq(user.username)
+      expect(json[:inventories].first[:product]).to eq('notebook')
+      expect(json[:inventories].first[:quantity]).to eq(5)
+    end
+  end
+
 
   describe "POST /api/users" do
     context 'when the request is valid' do
@@ -23,6 +47,12 @@ RSpec.describe "API UsersController", type: :request do
         }
 
         it 'create a user' do
+          expect(json[:id]).not_to be_nil
+          expect(json[:name]).to eq(valid_attributes[:user][:name])
+          expect(json[:email]).to eq(valid_attributes[:user][:email])
+          expect(json[:birth_date].to_date).to eq(valid_attributes[:user][:birth_date])
+          expect(json[:country]).to eq(valid_attributes[:user][:country])
+          expect(json[:username]).to eq('marianefps')
           expect(json[:inventories].first[:product]).to eq('notebook')
           expect(json[:inventories].first[:quantity]).to eq(5)
         end
@@ -84,6 +114,8 @@ RSpec.describe "API UsersController", type: :request do
   end
 
   describe "POST /api/users/:id/exchange" do
+    let(:requester) { create :user }
+    let(:receiver) { create :user }
     let(:params_exchange) do
       {
         products_requester: [
@@ -139,6 +171,36 @@ RSpec.describe "API UsersController", type: :request do
         expect(receiver.inventories.find_by(product: 'laser_printer')).to be_nil
       end
 
+    end
+  end
+
+  describe "PUT /api/users/:id/on_vacation" do
+    let(:user) { create :user, on_vacation: false }
+
+    before(:each) { put on_vacation_user_path(user) }
+
+    it 'returns status http no content' do
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it 'user on vacation true' do
+      user.reload
+      expect(user.on_vacation?).to eq(true)
+    end
+  end
+
+  describe "PUT /api/users/:id/return_vacation" do
+    let(:user) { create :user, on_vacation: true }
+
+    before(:each) { put return_vacation_user_path(user) }
+
+    it 'returns status http no content' do
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it 'user on vacation false' do
+      user.reload
+      expect(user.on_vacation?).to eq(false)
     end
   end
 

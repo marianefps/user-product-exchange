@@ -42,6 +42,9 @@ class ProductExchangeService
   end
 
   def valid?
+    validade_users_vacation
+
+    return false if @errors.any?
     validate_requester_kind_of_product
     validate_receiver_kind_of_product
 
@@ -57,6 +60,12 @@ class ProductExchangeService
   end
 
   private
+
+  def validade_users_vacation
+    @errors << 'Inventory is unavailable for requester' if @requester.on_vacation?
+    @errors << 'Inventory is unavailable for receiver' if @receiver.on_vacation?
+
+  end
 
   def validate_requester_kind_of_product
     valid_kinds = @products_requester.map do |product|

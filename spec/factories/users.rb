@@ -3,7 +3,7 @@ FactoryBot.define do
     sequence(:name) { |n| "person #{n}" }
     sequence(:username) { |n| "person#{n}" }
     sequence(:email) { |n| "person#{n}@example.com" }
-    birth_date { "2020-07-19" }
+    birth_date { "2020-07-19".to_date }
     country { "Brazil" }
   end
 end

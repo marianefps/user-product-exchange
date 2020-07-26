@@ -53,7 +53,34 @@ OBS: it's allowed to update only the country field
 
 ##### Return
 
-Success return http status :ok
+Success return http status :no_content
+
+On Failure return http status :unprocessable_entity
+On User not found retun http status :not_found
+
+
+#### Make User on Vacation
+
+`POST /api/users/:id/on_vacation`
+
+`Content-Type: application/json`
+
+##### Return
+
+Success return http status :no_content
+
+On Failure return http status :unprocessable_entity
+On User not found retun http status :not_found
+
+#### Make User return vacation
+
+`POST /api/users/:id/return_vacation`
+
+`Content-Type: application/json`
+
+##### Return
+
+Success return http status :no_content
 
 On Failure return http status :unprocessable_entity
 On User not found retun http status :not_found

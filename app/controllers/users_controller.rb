@@ -1,15 +1,20 @@
 class UsersController < ApplicationController
 
-  def create
-    @user = User.create! create_params
+  def show
+    user = User.find params[:id]
+    json_response user.to_json(include: { inventories: { only: %i[product quantity] } })
+  end
 
-    json_response @user.to_json(include: { inventories: { only: %i[product quantity] } }),
+  def create
+    user = User.create! create_params
+
+    json_response user.to_json(include: { inventories: { only: %i[product quantity] } }),
                   status: :created
   end
 
   def update
-    @user = User.find params[:id]
-    @user.update update_params
+    user = User.find params[:id]
+    user.update update_params
     head :no_content
   end
 
@@ -21,6 +26,18 @@ class UsersController < ApplicationController
     else
       json_response({ message: exchange.errors }, status: :unprocessable_entity)
     end
+  end
+
+  def on_vacation
+    user = User.find params[:id]
+    user.update! on_vacation: true
+    head :no_content
+  end
+
+  def return_vacation
+    user = User.find params[:id]
+    user.update! on_vacation: false
+    head :no_content
   end
 
   private
