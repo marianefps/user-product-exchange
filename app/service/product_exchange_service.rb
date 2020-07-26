@@ -2,20 +2,51 @@ class ProductExchangeService
   attr_accessor :errors
   def initialize(requester, params_exchange)
     @requester = requester
-    @products_requester = params_exchange[:products_requester]
+    @products_requester = params_exchange[:products_requester].map do |product|
+      {product: product[:product], quantity: product[:quantity].to_i}
+    end
 
     @receiver = User.find params_exchange[:receiver]
-    @products_receiver = params_exchange[:products_receiver]
+    @products_receiver = params_exchange[:products_receiver].map do |product|
+      {product: product[:product], quantity: product[:quantity].to_i}
+    end
 
     @errors = []
+  end
+
+  def save
+    return false unless valid?
+
+    Inventory.transaction do
+      @products_requester.each do |product|
+        inventory_requester = @requester.inventories.find_by product: product[:product]
+        inventory_requester.quantity -= product[:quantity]
+        inventory_requester.quantity.zero? ? inventory_requester.destroy! : inventory_requester.save!
+
+        inventory_receiver = @receiver.inventories.find_or_initialize_by product: product[:product]
+        inventory_receiver.quantity += product[:quantity]
+        inventory_receiver.save!
+      end
+
+      @products_receiver.each do |product|
+        inventory_receiver = @receiver.inventories.find_by product: product[:product]
+        inventory_receiver.quantity -= product[:quantity]
+        inventory_receiver.quantity.zero? ? inventory_receiver.destroy! : inventory_receiver.save!
+
+        inventory_requester = @requester.inventories.find_or_initialize_by product: product[:product]
+        inventory_requester.quantity += product[:quantity]
+        inventory_requester.save!
+      end
+    end
+    true
   end
 
   def valid?
     validate_requester_kind_of_product
     validate_receiver_kind_of_product
 
-
     return false if @errors.any?
+
     validate_requester_has_product
     validate_receiver_has_product
     return false if @errors.any?

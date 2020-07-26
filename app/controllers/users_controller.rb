@@ -13,7 +13,23 @@ class UsersController < ApplicationController
     head :no_content
   end
 
+  def exchange
+    requester = User.find params[:id]
+    exchange = ProductExchangeService.new requester, exchange_params
+    if exchange.save
+      head :ok
+    else
+      json_response({ message: exchange.errors }, status: :unprocessable_entity)
+    end
+  end
+
   private
+
+  def exchange_params
+    params.require(:exchange).permit :receiver,
+                                     { products_requester: %i[product quantity] },
+                                     { products_receiver: %i[product quantity] }
+  end
 
   def create_params
     params.require(:user).permit :name,
