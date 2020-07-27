@@ -64,7 +64,6 @@ class ProductExchangeService
   def validade_users_vacation
     @errors << 'Inventory is unavailable for requester' if @requester.on_vacation?
     @errors << 'Inventory is unavailable for receiver' if @receiver.on_vacation?
-
   end
 
   def validate_requester_kind_of_product

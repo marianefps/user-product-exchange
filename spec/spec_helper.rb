@@ -16,7 +16,10 @@
 require 'factory_bot'
 require 'shoulda-matchers'
 require 'database_cleaner-active_record'
+require 'simplecov'
 
+
+SimpleCov.start 'rails'
 
 RSpec.configure do |config|
 
